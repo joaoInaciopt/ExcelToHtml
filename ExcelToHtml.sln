@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31205.134
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1500
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excel_To_Html", "ExcelToHtml\Excel_To_Html.csproj", "{3C6476A8-A156-4DB7-8ED5-6CD18DA32708}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToHtml", "ExcelToHtml\ExcelToHtml.csproj", "{3C6476A8-A156-4DB7-8ED5-6CD18DA32708}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToHtml.console", "ExcelToHtml.console\ExcelToHtml.console.csproj", "{CEA40B00-BF81-4005-8715-EA196476FDBA}"
 EndProject
