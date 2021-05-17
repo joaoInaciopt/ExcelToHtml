@@ -12,8 +12,8 @@ namespace ExcelToHtml.console
 
 #if DEBUG  //TEST DATA 
             var testdata = new List<string>{
-                @"c:\git\ExcelToHtml\Test\default1.xlsx"
-             //   @"-data=http://nflarrest.com/api/v1/crime"
+                @"testtables.xlsx"
+                //@"-data=http://nflarrest.com/api/v1/crime"
                // @"-data=https://transit.land//api/v1/changesets/1/change_payloads",
                // @"-output=pdf"
             };
@@ -48,10 +48,19 @@ namespace ExcelToHtml.console
                 Console.WriteLine(" Processing {0}", ExcelPath);
 
                 //Read Excel File 
-                FileInfo ExcelFile = new FileInfo(ExcelPath);
+               //FileInfo ExcelFile = new FileInfo(ExcelPath);
 
 
-                var WorksheetHtml = new ExcelToHtml.ToHtml(ExcelFile);
+            FileStream fileStream = File.OpenRead(ExcelPath);
+            //create new MemoryStream object
+            MemoryStream memStream = new MemoryStream();
+            memStream.SetLength(fileStream.Length);
+            //read file to MemoryStream
+            fileStream.Read(memStream.GetBuffer(), 0, (int)fileStream.Length);
+            byte[] array_chavepublica = memStream.ToArray();
+
+
+            var WorksheetHtml = new ExcelToHtml.ToHtml(array_chavepublica, "Folha1");
 
                 WorksheetHtml.DebugMode = true;
 

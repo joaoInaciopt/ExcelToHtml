@@ -59,9 +59,9 @@
     <Compile Include="TestObject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ExcelToHtml\ExcelToHtml.csproj">
+    <ProjectReference Include="..\ExcelToHtml\Excel_To_Html.csproj">
       <Project>{3c6476a8-a156-4db7-8ed5-6cd18da32708}</Project>
-      <Name>ExcelToHtml</Name>
+      <Name>Excel_To_Html</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

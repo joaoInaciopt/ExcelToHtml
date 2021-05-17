@@ -23,27 +23,39 @@ namespace ExcelToHtml
         string ObjectJson;
 
         /// If not specified first used
-        private string WorksheetName = String.Empty;
+        
         public ExcelPackage Excel;
         ExcelWorksheet WorkSheet;
         IXLWorksheet closedWorksheet; //closedxml  to get valid colors
         private Dictionary<string, string> TemplateFieldList;
         private Dictionary<string, string> cellStyles;
 
-        public ToHtml(FileInfo excelFile, string WorkSheetName = null)
+
+
+
+        /*FileInfo excelFile*/
+        public ToHtml(byte[] ssBinary_Data, string WorkSheetName = null)
         {
+            /*
             if (!excelFile.Exists)
                 throw new Exception(String.Format("File {0} Not Found", excelFile.FullName));
 
             Excel = new ExcelPackage(excelFile);
 
             XLWorkbook workBook = new XLWorkbook(excelFile.FullName); //closedxml only temporary to get valid colors
+            */
+            
+            Excel = new ExcelPackage();
+            Stream s = new MemoryStream(ssBinary_Data);
+            Excel.Load(s);
+
+            XLWorkbook workBook = new XLWorkbook(s);
 
 
             if (!string.IsNullOrEmpty(WorkSheetName))
             {
-                WorkSheet = Excel.Workbook.Worksheets[WorksheetName];
-                closedWorksheet = workBook.Worksheet(WorksheetName);//closedxml only temporary to get valid colors
+                WorkSheet = Excel.Workbook.Worksheets[WorkSheetName];
+                closedWorksheet = workBook.Worksheet(WorkSheetName);//closedxml only temporary to get valid colors
             }
             else
             {
@@ -66,8 +78,8 @@ namespace ExcelToHtml
 
             if (!string.IsNullOrEmpty(WorkSheetName))
             {
-                WorkSheet = Excel.Workbook.Worksheets[WorksheetName];
-                closedWorksheet = workBook.Worksheet(WorksheetName);//closedxml only temporary to get valid colors
+                WorkSheet = Excel.Workbook.Worksheets[WorkSheetName];
+                closedWorksheet = workBook.Worksheet(WorkSheetName);//closedxml only temporary to get valid colors
             }
             else
             {
@@ -136,17 +148,25 @@ namespace ExcelToHtml
                         if (!WorkSheet.Column(col).Hidden)
                         {
                             var d = WorkSheet.Cells[row, col];
-
+                           /*bool a;
+                            if (d.ToString() == "L19")
+                                a = true;
+                           */
+                            ExcelRange LastMergedCell = null;
                             int merged = 0;
 
                             if (d.Merge) //row is merged
+                            {
                                 merged = d.Worksheet.SelectedRange[WorkSheet.MergedCells[row, col]].Columns;
-
+                                LastMergedCell = WorkSheet.Cells[row, col + (merged - 1)];
+                            }
                             //11 default font size
-                            var x = ProcessCellStyle(WorkSheet.Cells[row, col], WorkSheet.Column(col).Width, 11, merged);
+                            var x = ProcessCellStyle(WorkSheet.Cells[row, col], WorkSheet.Column(col).Width, 11, merged, LastMergedCell);
+
                             sb.AppendLine(x);
                             if (d.Merge)
                                 col += (merged - 1);
+                            
                         }
                     }
                     sb.AppendLine("</tr>");
@@ -442,7 +462,7 @@ namespace ExcelToHtml
             }
         }
 
-        private string ProcessCellStyle(ExcelRange input, double Width = -1, int FontSize = 11, int ColSpan = 0)
+        private string ProcessCellStyle(ExcelRange input, double Width = -1, int FontSize = 11, int ColSpan = 0, ExcelRange LastMergedCell = null)
         {
             cellStyles = new Dictionary<string, string>();
 
@@ -454,6 +474,10 @@ namespace ExcelToHtml
             PropertyToStyle("border-right", input.Style.Border.Right, cellAddress: input.Address);
             PropertyToStyle("border-bottom", input.Style.Border.Bottom, cellAddress: input.Address);
             PropertyToStyle("border-left", input.Style.Border.Left, cellAddress: input.Address);
+            /*is a merged cell and border right is not defined yet*/
+            if (ColSpan != 0 && !cellStyles.ContainsKey("border-right")) {
+                PropertyToStyle("border-right", LastMergedCell.Style.Border.Right, cellAddress: LastMergedCell.Address);
+            }
 
             //Align
             PropertyToStyle("text-align", input.Style.HorizontalAlignment.ToString(), "General");
@@ -565,12 +589,12 @@ namespace ExcelToHtml
 
             if (cellColor.ColorType == XLColorType.Color)
             {
-                return "#" + cellColor.Color.ToHex().Remove(0, 2);
+                return "rgb(" + cellColor.Color.R +"," + cellColor.Color.G + "," + cellColor.Color.B + ")";
             }
             else if (cellColor.ColorType == XLColorType.Indexed)
             {
                 if (cellColor.Color.Name != "Transparent")
-                    return "#" + cellColor.Color.ToHex().Remove(0, 2);
+                    return "rgb(" + cellColor.Color.R + "," + cellColor.Color.G + "," + cellColor.Color.B + ")";
 
             }
             else  //(cell.Style.Fill.BackgroundColor.ColorType == XLColorType.Theme)
